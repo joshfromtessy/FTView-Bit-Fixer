@@ -22,6 +22,10 @@ public sealed class UpdateChecker
         var release = await FetchLatestReleaseAsync(cancellationToken).ConfigureAwait(false);
         if (release is null)
         {
+            if (cache is null)
+            {
+                return null;
+            }
             return BuildUpdateFromCache(cache, currentVersion);
         }
 
@@ -141,7 +145,7 @@ public sealed class UpdateChecker
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
             var payload = await JsonSerializer.DeserializeAsync<ReleasePayload>(stream, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            if (payload?.TagName is null || payload.HtmlUrl is null)
+            if (payload is null || payload.TagName is null || payload.HtmlUrl is null)
             {
                 return null;
             }
