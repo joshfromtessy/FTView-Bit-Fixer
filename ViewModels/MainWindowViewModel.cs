@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
@@ -28,6 +30,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private readonly AlarmParser _parser = new();
     private readonly ExcelExporter _exporter = new();
+    private readonly UpdateChecker _updateChecker = new();
     private readonly IStorageProvider? _storageProvider;
 
     public MainWindowViewModel(IStorageProvider? storageProvider)
@@ -35,6 +38,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _storageProvider = storageProvider;
         InputFiles.CollectionChanged += OnInputFilesChanged;
         Status = "Drop FactoryTalk View XML exports here or click Open.";
+        _ = CheckForUpdatesAsync();
     }
 
     public ObservableCollection<string> InputFiles { get; } = new();
@@ -66,6 +70,15 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private int skippedRows;
 
+    [ObservableProperty]
+    private bool updateAvailable;
+
+    [ObservableProperty]
+    private string? updateVersion;
+
+    [ObservableProperty]
+    private string? updateUrl;
+
     public bool CanExport => InputFiles.Count > 0
                              && !IsBusy
                              && !string.IsNullOrWhiteSpace(OutputPath);
@@ -86,6 +99,11 @@ public partial class MainWindowViewModel : ViewModelBase
         => TotalRows == 0
             ? "No rows parsed yet."
             : $"Rows exported: {ExportedRows} / {TotalRows} (skipped {SkippedRows})";
+
+    public string UpdateLabel
+        => string.IsNullOrWhiteSpace(UpdateVersion)
+            ? "Update available"
+            : $"Update available: {UpdateVersion}";
 
     public IBrush DropBorderBrush => IsDragOver ? DropBorderActive : DropBorderIdle;
 
@@ -268,6 +286,28 @@ public partial class MainWindowViewModel : ViewModelBase
         });
     }
 
+    [RelayCommand]
+    private void OpenUpdateLink()
+    {
+        if (string.IsNullOrWhiteSpace(UpdateUrl))
+        {
+            return;
+        }
+
+        try
+        {
+            var info = new ProcessStartInfo
+            {
+                FileName = UpdateUrl,
+                UseShellExecute = true
+            };
+            Process.Start(info);
+        }
+        catch
+        {
+        }
+    }
+
     private void OnInputFilesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(CanExport));
@@ -305,6 +345,11 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnSkippedRowsChanged(int value)
     {
         OnPropertyChanged(nameof(RowSummary));
+    }
+
+    partial void OnUpdateVersionChanged(string? value)
+    {
+        OnPropertyChanged(nameof(UpdateLabel));
     }
 
     private static bool IsXmlFile(string? path)
@@ -366,5 +411,35 @@ public partial class MainWindowViewModel : ViewModelBase
 
             return string.Compare(x.Raw, y.Raw, StringComparison.OrdinalIgnoreCase);
         }
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            var currentVersion = GetCurrentVersion();
+            var cachePath = UpdateChecker.GetDefaultCachePath();
+            var update = await _updateChecker.CheckForUpdatesAsync(currentVersion, cachePath).ConfigureAwait(false);
+            if (update is null)
+            {
+                return;
+            }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                UpdateAvailable = true;
+                UpdateVersion = update.DisplayVersion;
+                UpdateUrl = update.Url;
+            });
+        }
+        catch
+        {
+        }
+    }
+
+    private static Version GetCurrentVersion()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        return version ?? new Version(1, 0, 0, 0);
     }
 }
