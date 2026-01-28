@@ -10,7 +10,7 @@
         Title="FT Alarm Fixer"
         Icon="/Assets/ft-fixer.ico"
         Width="420"
-        Height="410"
+        SizeToContent="Height"
         MinWidth="380"
         MinHeight="370"
         FontFamily="Bahnschrift, Segoe UI"
