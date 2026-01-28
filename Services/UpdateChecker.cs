@@ -18,14 +18,6 @@ public sealed class UpdateChecker
     public async Task<UpdateInfo?> CheckForUpdatesAsync(Version currentVersion, string cachePath, CancellationToken cancellationToken = default)
     {
         var cache = await ReadCacheAsync(cachePath, cancellationToken).ConfigureAwait(false);
-        if (cache is not null && cache.LastCheckedUtc.HasValue)
-        {
-            var age = DateTime.UtcNow - cache.LastCheckedUtc.Value;
-            if (age.TotalHours < 24)
-            {
-                return BuildUpdateFromCache(cache, currentVersion);
-            }
-        }
 
         var release = await FetchLatestReleaseAsync(cancellationToken).ConfigureAwait(false);
         if (release is null)
