@@ -150,7 +150,7 @@ public sealed class UpdateChecker
                 return null;
             }
 
-            return new ReleaseInfo(payload.TagName, payload.HtmlUrl);
+            return new ReleaseInfo(payload.TagName!, payload.HtmlUrl!);
         }
         catch
         {
