@@ -1,0 +1,120 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FT_AlarmFixer.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="560" d:DesignHeight="420"
+        x:Class="FT_AlarmFixer.Views.OptionsWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="FT Alarm Fixer Options"
+        Icon="/Assets/ft-fixer.ico"
+        Width="520"
+        Height="420"
+        MinWidth="460"
+        MinHeight="380"
+        FontFamily="Bahnschrift, Segoe UI">
+
+    <Window.Background>
+        <SolidColorBrush Color="#F5F6F8" />
+    </Window.Background>
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#1C232B" />
+        </Style>
+        <Style Selector="TextBlock.subtitle">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Opacity" Value="0.7" />
+            <Setter Property="Foreground" Value="#5B6672" />
+        </Style>
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#27313A" />
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#2D6CDF" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="14,6" />
+            <Setter Property="BorderBrush" Value="#2D6CDF" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.primary:hover">
+            <Setter Property="Background" Value="#3977E0" />
+            <Setter Property="BorderBrush" Value="#3977E0" />
+        </Style>
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="#EEF1F4" />
+            <Setter Property="Foreground" Value="#1F2A33" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="BorderBrush" Value="#D6DCE3" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.secondary:hover">
+            <Setter Property="Background" Value="#E2E7EE" />
+            <Setter Property="BorderBrush" Value="#C2CAD3" />
+        </Style>
+        <Style Selector="TextBox.input">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#D6DCE3" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+        <Style Selector="ListBox.files">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#D6DCE3" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="16" RowSpacing="12">
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Text="Options" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="Adjust export details and review parsed files." Classes="subtitle" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#D6DCE3" BorderThickness="1" CornerRadius="10" Padding="12">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                <TextBlock Text="Export Location" Classes="section-title" Grid.ColumnSpan="2" />
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding OutputPath}" Watermark="Choose a folder and file name..." Classes="input" />
+                <Button Grid.Row="1" Grid.Column="1" Content="Browse" Command="{Binding BrowseOutputCommand}" Classes="secondary" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Background="#FFFFFF" BorderBrush="#D6DCE3" BorderThickness="1" CornerRadius="10" Padding="12">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Export Rules" Classes="section-title" />
+                <CheckBox Content="Ignore blank descriptions" IsChecked="{Binding IgnoreBlankDescriptions}" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Background="#FFFFFF" BorderBrush="#D6DCE3" BorderThickness="1" CornerRadius="10" Padding="12">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Files" Classes="section-title" />
+                <ListBox ItemsSource="{Binding InputFiles}" Height="140" Classes="files">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Content="Clear Files" Command="{Binding ClearFilesCommand}" Classes="secondary" HorizontalAlignment="Left" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="4" Background="#FFFFFF" BorderBrush="#D6DCE3" BorderThickness="1" CornerRadius="10" Padding="12">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Status" Classes="section-title" />
+                <ProgressBar Height="10"
+                             Background="#E2E7EE"
+                             IsIndeterminate="{Binding IsBusy}"
+                             Minimum="0"
+                             Maximum="1"
+                             Value="{Binding Progress}" />
+                <TextBlock Text="{Binding Status}" Classes="subtitle" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding RowSummary}" Classes="subtitle" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

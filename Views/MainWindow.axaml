@@ -1,0 +1,195 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FT_AlarmFixer.ViewModels"
+        xmlns:input="using:Avalonia.Input"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="520" d:DesignHeight="360"
+        x:Class="FT_AlarmFixer.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="FT Alarm Fixer"
+        Icon="/Assets/ft-fixer.ico"
+        Width="420"
+        Height="380"
+        MinWidth="380"
+        MinHeight="340"
+        FontFamily="Bahnschrift, Segoe UI"
+        input:DragDrop.AllowDrop="True"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="32"
+        ExtendClientAreaChromeHints="NoChrome">
+
+    <Window.Background>
+        <SolidColorBrush Color="#F5F6F8" />
+    </Window.Background>
+
+    <Window.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#D6DCE3" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#1C232B" />
+        </Style>
+        <Style Selector="TextBlock.subtitle">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Opacity" Value="0.7" />
+            <Setter Property="Foreground" Value="#5B6672" />
+        </Style>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#D6DCE3" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="Border#DropZone">
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="16" />
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#2D6CDF" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="BorderBrush" Value="#2D6CDF" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.primary:hover">
+            <Setter Property="Background" Value="#3977E0" />
+            <Setter Property="BorderBrush" Value="#3977E0" />
+        </Style>
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="#EEF1F4" />
+            <Setter Property="Foreground" Value="#1F2A33" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="BorderBrush" Value="#D6DCE3" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.secondary:hover">
+            <Setter Property="Background" Value="#E2E7EE" />
+            <Setter Property="Foreground" Value="#1F2A33" />
+            <Setter Property="BorderBrush" Value="#C2CAD3" />
+        </Style>
+        <Style Selector="Button.titlebar">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#1C232B" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="6,2" />
+        </Style>
+        <Style Selector="Button.titlebar:hover">
+            <Setter Property="Background" Value="#E5E9F1" />
+        </Style>
+        <Style Selector="Button.titlebar.danger:hover">
+            <Setter Property="Background" Value="#F5E1E3" />
+        </Style>
+    </Window.Styles>
+
+    <Border Classes="card" Margin="0">
+        <Grid RowDefinitions="Auto,*" Margin="0">
+            <Border Grid.Row="0" Height="32" Background="#FFFFFF" x:Name="TitleBar">
+                <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                    <Border Width="22" Height="22" CornerRadius="6" Background="#2D6CDF" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="6,0,8,0">
+                        <TextBlock Text="F"
+                                   Foreground="White"
+                                   FontWeight="Bold"
+                                   FontSize="12"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Grid.Column="1"
+                               Text="FT Alarm Fixer"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="#1C232B"
+                               VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" Margin="0,0,6,0">
+                        <Button Classes="titlebar" Command="{Binding OpenAboutCommand}">
+                            <Viewbox Width="12" Height="12">
+                                <Path Data="M8,1 A7,7 0 1 1 7.999,1 Z M8,4 A1,1 0 1 0 8.001,4 Z M7,6 L9,6 L9,12 L7,12 Z"
+                                      Fill="#1C232B" />
+                            </Viewbox>
+                        </Button>
+                        <Button Content="-" Classes="titlebar" Click="OnMinimizeClick" />
+                        <Button Content="X" Classes="titlebar danger" Click="OnCloseClick" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,Auto" Margin="10,8,10,10" RowSpacing="10">
+                <Border Grid.Row="0"
+                        x:Name="DropZone"
+                        BorderBrush="{Binding DropBorderBrush}"
+                        Background="{Binding DropBackground}"
+                        Padding="16"
+                        input:DragDrop.AllowDrop="True">
+                    <StackPanel Spacing="10" HorizontalAlignment="Center" Width="320">
+                        <TextBlock Text="{Binding DropTitle}" FontSize="15" FontWeight="SemiBold" Foreground="#1F2A33" TextAlignment="Center" />
+                        <TextBlock Text="{Binding DropSubtitle}" Classes="subtitle" TextAlignment="Center" />
+                        <Border Background="#EEF1F4" CornerRadius="999" Padding="8,3" HorizontalAlignment="Center">
+                            <TextBlock Text="XML only" FontSize="11" FontWeight="SemiBold" Foreground="#3A4652" />
+                        </Border>
+                        <TextBlock Text="{Binding InputSummary}" Classes="subtitle" TextAlignment="Center" />
+                        <Button Command="{Binding OpenFilesCommand}" Classes="secondary" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Viewbox Width="14" Height="14">
+                                    <Path Data="M2,4 L7,4 L9,6 L14,6 L14,12 L2,12 Z M2,4 L2,12"
+                                          Stroke="#1F2A33"
+                                          StrokeThickness="1.4" />
+                                </Viewbox>
+                                <TextBlock Text="Open XML Files" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#D6DCE3" BorderThickness="1" CornerRadius="10" Padding="10">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="6">
+                        <TextBlock Text="Export path" Classes="subtitle" Grid.ColumnSpan="2" />
+                        <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding OutputPath}" Watermark="Choose a folder and file name..." />
+                        <Button Grid.Row="1" Grid.Column="1" Command="{Binding BrowseOutputCommand}" Classes="secondary">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Viewbox Width="14" Height="14">
+                                    <Path Data="M2,4 L6,4 L7.5,6 L14,6 L14,12 L2,12 Z"
+                                          Stroke="#1F2A33"
+                                          StrokeThickness="1.4" />
+                                </Viewbox>
+                                <TextBlock Text="Browse" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                    <StackPanel Spacing="4">
+                        <CheckBox Content="Ignore blank descriptions" IsChecked="{Binding IgnoreBlankDescriptions}" />
+                        <TextBlock Text="{Binding RowSummary}" Classes="subtitle" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Command="{Binding ExportCommand}" IsEnabled="{Binding CanExport}" Classes="primary">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Viewbox Width="14" Height="14">
+                                <Path Data="M8,2 L8,9 M5,6 L8,9 L11,6 M3,12 L13,12"
+                                      Stroke="#FFFFFF"
+                                      StrokeThickness="1.6"
+                                      StrokeLineCap="Round" />
+                            </Viewbox>
+                            <TextBlock Text="Export" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <StackPanel Grid.Row="3" Spacing="6">
+                    <ProgressBar Height="10"
+                                 Background="#E2E7EE"
+                                 IsIndeterminate="{Binding IsBusy}"
+                                 Minimum="0"
+                                 Maximum="1"
+                                 Value="{Binding Progress}" />
+                    <TextBlock Text="{Binding Status}" Classes="subtitle" TextWrapping="Wrap" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
