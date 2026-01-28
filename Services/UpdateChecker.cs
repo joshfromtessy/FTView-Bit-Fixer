@@ -53,7 +53,7 @@ public sealed class UpdateChecker
             return null;
         }
 
-        if (!TryParseVersion(cache.LatestVersion, out var latestVersion))
+        if (!TryParseVersion(cache.LatestVersion, out var latestVersion) || latestVersion is null)
         {
             return null;
         }
@@ -68,7 +68,7 @@ public sealed class UpdateChecker
 
     private static UpdateInfo? BuildUpdateFromRelease(ReleaseInfo release, Version currentVersion)
     {
-        if (!TryParseVersion(release.Version, out var latestVersion))
+        if (!TryParseVersion(release.Version, out var latestVersion) || latestVersion is null)
         {
             return null;
         }
@@ -81,7 +81,7 @@ public sealed class UpdateChecker
         return new UpdateInfo(release.Version, release.Url, latestVersion);
     }
 
-    private static bool TryParseVersion(string value, out Version version)
+    private static bool TryParseVersion(string value, out Version? version)
     {
         var trimmed = value.Trim();
         if (trimmed.StartsWith("v", StringComparison.OrdinalIgnoreCase))
